@@ -17,6 +17,7 @@ using namespace std;
 
 string get_color_code(bool ascii)
 {
+  bool dark = true;
   const char* colorfgbg = getenv("COLORFGBG");
   if (colorfgbg)
   {
@@ -25,28 +26,15 @@ string get_color_code(bool ascii)
     if (last_sep != string::npos)
     {
       string bg = cfbg.substr(last_sep + 1);
-      if (bg == "0" || bg == "1" || bg == "2" || bg == "3" || bg == "4")
-        return ascii ? "\033[1;37m" : "\033[1;33m";
-      else
-        return ascii ? "\033[1;30m" : "\033[1;34m";
+      if (bg != "0" && bg != "1" && bg != "2" && bg != "3" && bg != "4")
+        dark = false;
     }
   }
 
-  const char* colorerm = getenv("COLORTERM");
-  if (colorerm && string(colorerm) == "truecolor")
-    return ascii ? "\033[38;2;180;200;255m" : "\033[38;2;255;190;150m";
-
-  const char* term_env = getenv("TERM");
-  if (term_env)
-  {
-    string term(term_env);
-    if (term.find("256color") != string::npos)
-      return ascii ? "\033[38;5;117m" : "\033[38;5;173m";
-    if (term.find("color") != string::npos)
-      return ascii ? "\033[1;36m" : "\033[1;35m";
-  }
-
-  return ascii ? "\033[1;37m" : "\033[1;33m";
+  if (dark)
+    return ascii ? "\033[1;36m" : "\033[1;33m";
+  else
+    return ascii ? "\033[34m" : "\033[35m";
 }
 
 int main(int argc, char* argv[])
