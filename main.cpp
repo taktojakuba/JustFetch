@@ -15,7 +15,7 @@
 
 using namespace std;
 
-string get_color_code()
+string get_color_code(bool ascii)
 {
   const char* colorfgbg = getenv("COLORFGBG");
   if (colorfgbg)
@@ -26,50 +26,54 @@ string get_color_code()
     {
       string bg = cfbg.substr(last_sep + 1);
       if (bg == "0" || bg == "1" || bg == "2" || bg == "3" || bg == "4")
-        return "\033[1;37m"; // dark background -> white/bright
+        return ascii ? "\033[1;37m" : "\033[1;33m";
       else
-        return "\033[1;30m"; // light background -> black/bright
+        return ascii ? "\033[1;30m" : "\033[1;34m";
     }
   }
 
   const char* colorerm = getenv("COLORTERM");
   if (colorerm && string(colorerm) == "truecolor")
-    return "\033[38;2;180;200;255m"; // soft pastel blue for truecolor
+    return ascii ? "\033[38;2;180;200;255m" : "\033[38;2;255;190;150m";
 
   const char* term_env = getenv("TERM");
   if (term_env)
   {
     string term(term_env);
     if (term.find("256color") != string::npos)
-      return "\033[38;5;117m"; // muted pastel (256-color)
+      return ascii ? "\033[38;5;117m" : "\033[38;5;173m";
     if (term.find("color") != string::npos)
-      return "\033[1;36m"; // basic 8-color bright cyan
+      return ascii ? "\033[1;36m" : "\033[1;35m";
   }
 
-  return "\033[1;37m"; // default bright
+  return ascii ? "\033[1;37m" : "\033[1;33m";
 }
 
 int main(int argc, char* argv[])
 {
-  array<string, 8> info = {
-    "Host: " + get_hostname(),
-    "OS: " + get_osname(),
-    "Kernel: " + get_kernel(),
-    "Shell: " + get_shell(),
-    "Term: " + get_term(),
-    "WM: " + get_wm(),
-    "Uptime: " + get_uptime(),
-    "Packages: " + get_packages()
-  };
-
-  const string color = get_color_code();
+  const string color = get_color_code(true);
+  const string label_color = get_color_code(false);
   const string reset = "\033[0m";
+
+  array<string, 8> labels = {
+    "Host", "OS", "Kernel", "Shell", "Term", "WM", "Uptime", "Packages"
+  };
+  array<string, 8> values = {
+    get_hostname(),
+    get_osname(),
+    get_kernel(),
+    get_shell(),
+    get_term(),
+    get_wm(),
+    get_uptime(),
+    get_packages()
+  };
 
   if (argc < 2)
   {
-    for (int i = 0; i < info.size(); i++)
+    for (int i = 0; i < labels.size(); i++)
     {
-      cout << info[i] << endl;
+      cout << label_color << labels[i] << reset << ": " << values[i] << endl;
     }
     return 0;
   }
@@ -80,9 +84,9 @@ int main(int argc, char* argv[])
   while (getline(file, line))
   {
     cout << color << line << reset;
-    if (i < info.size())
+    if (i < values.size())
     {
-      cout << "  " << info[i];
+      cout << "  " << label_color << labels[i] << reset << ": " << values[i];
     }
     cout << endl;
     ++i;
