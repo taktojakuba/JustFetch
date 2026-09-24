@@ -1,2 +1,4 @@
 build/*
 jf
+result
+flake.lock
