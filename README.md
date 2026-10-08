@@ -5,6 +5,6 @@
 <code>git clone https://github.com/taktojakuba/JustFetch.git && cd JustFetch && sudo make install</code><br>
 <b>Uninstall</b><br>
 cd JustFetch && sudo make uninstall && cd .. && rm -rf JustFetch<br>
-<b>ussage</b><br>
+<b>Usage</b><br>
 jf -- no art<br>
 jf /path/to/ascii -- stats with art<br>
